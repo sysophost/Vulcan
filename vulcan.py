@@ -9,6 +9,7 @@ PARSER = argparse.ArgumentParser()
 PARSER.add_argument('--inputfile', '-if', type=str, required=True, help='Path to input .nessus file')
 PARSER.add_argument('--outputfile', '-of', type=str, default='./compliance_results.csv', help='Path to output CSV file')
 PARSER.add_argument('--outputdelim', '-od', type=str, default=',', help='Output file delimiter (default: "%(default)s")')
+PARSER.add_argument('--urls', '-u', action='store_true', help='Only print things with http:// or https:// URI')
 PARSER.add_argument('--verbose', '-v', action='store_true', help='Enable verbose output')
 
 ARGS = PARSER.parse_args()
@@ -39,7 +40,8 @@ def main():
                     logging.debug(f"[i] Found {len(tcp_services)} TCP and {len(udp_services)} UDP service(s)")
 
                     for service in services:
-                        print(f"{service.uri}{service.hostname}:{service.port}")
+                        if (ARGS.urls and service.uri in ['http://', 'https://']) or not ARGS.urls:
+                            print(f"{service.uri}{service.hostname}:{service.port}")
                 else:
                     logging.debug(f"[i] No services found")
 
