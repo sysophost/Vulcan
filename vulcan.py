@@ -35,7 +35,7 @@ def main():
                 if services:
                     tcp_services = list(filter(lambda x: x.protocol == 'tcp', services))
                     udp_services = list(filter(lambda x: x.protocol == 'udp', services))
-                    logging.debug(f"[i] Found {len(tcp_services)} TCP and {len(udp_services)} UDP service(s)")
+                    logging.debug(f"[i] Found {len(tcp_services)} TCP and {len(udp_services)} UDP services")
 
                     for service in services:
                         if (ARGS.urls and service.uri in ['http://', 'https://']) or not ARGS.urls:
