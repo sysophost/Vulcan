@@ -41,7 +41,7 @@ def main():
 
                     for service in services:
                         if (ARGS.urls and service.uri in ['http://', 'https://']) or not ARGS.urls:
-                            service_uris.append(f"{service.uri}{service.hostname}:{service.port}")
+                            service_uris.append(service)
                 else:
                     logging.debug(f"[i] No services found")
 
@@ -51,8 +51,9 @@ def main():
             # output.write_output(ARGS.outputfile, headers, report_issues, ARGS.outputdelim)
             # logging.info(f"[i] Output file written to: {ARGS.outputfile}")
 
-        for uri in service_uris:
-            print(uri)
+        service_uris = sorted(service_uris, key=lambda x: x.uri)
+        for service in service_uris:
+            print((f"{service.uri}{service.hostname}:{service.port}"))
 
     except Exception as err:
         logging.error(f"[!] {err}")
