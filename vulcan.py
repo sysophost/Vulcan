@@ -9,9 +9,14 @@ PARSER = argparse.ArgumentParser()
 PARSER.add_argument('--inputfile', '-if', type=str, required=True, help='Path to input .nessus file')
 PARSER.add_argument('--outputfile', '-of', type=str, default='./compliance_results.csv', help='Path to output CSV file')
 PARSER.add_argument('--outputdelim', '-od', type=str, default=',', help='Output file delimiter (default: "%(default)s")')
+PARSER.add_argument('--verbose', '-v', action='store_true', help='Enable verbose output')
+
 ARGS = PARSER.parse_args()
 
-logging.basicConfig(format='%(message)s', level=logging.INFO, stream=sys.stderr)
+if ARGS.verbose:
+    logging.basicConfig(format='%(message)s', level=logging.DEBUG, stream=sys.stderr)
+else:
+    logging.basicConfig(format='%(message)s', level=logging.INFO, stream=sys.stderr)
 
 
 def main():
@@ -31,15 +36,15 @@ def main():
             for host in report_hosts:
                 logging.debug(f"[i] Collecting services for host: {host.get('name')}")
                 services = parser.parse_services(host, xml_namespaces)
-                logging.debug(f"[i] Found {len(services)} service(s)")
                 if services:
                     tcp_services = list(filter(lambda x: x.protocol == 'tcp', services))
                     udp_services = list(filter(lambda x: x.protocol == 'udp', services))
-
-                    logging.debug(f"\tTCP: {len(tcp_services)}\n\tUDP: {len(udp_services)}")
+                    logging.debug(f"[i] Found {len(tcp_services)} TCP and {len(udp_services)} UDP service(s)")
 
                     for service in services:
                         print(f"{service.uri}{service.hostname}:{service.port}")
+                else:
+                    logging.debug(f"[i] No services found")
 
             # sort issues by name
             # report_issues = sorted(report_issues, key=lambda x: x.name)
