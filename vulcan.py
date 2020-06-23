@@ -7,8 +7,6 @@ from modules import parser
 
 PARSER = argparse.ArgumentParser()
 PARSER.add_argument('--inputfile', '-if', type=str, required=True, help='Path to input .nessus file')
-PARSER.add_argument('--outputfile', '-of', type=str, default='./compliance_results.csv', help='Path to output CSV file')
-PARSER.add_argument('--outputdelim', '-od', type=str, default=',', help='Output file delimiter (default: "%(default)s")')
 PARSER.add_argument('--urls', '-u', action='store_true', help='Only print things with http:// or https:// URI')
 PARSER.add_argument('--verbose', '-v', action='store_true', help='Enable verbose output')
 
@@ -45,13 +43,7 @@ def main():
                 else:
                     logging.debug(f"[i] No services found")
 
-            # sort issues by name
-            # report_issues = sorted(report_issues, key=lambda x: x.name)
-            # headers = ['Host', 'Check Name', 'Configured Value', 'Expected Value', 'Info', 'Solution', 'Result']
-            # output.write_output(ARGS.outputfile, headers, report_issues, ARGS.outputdelim)
-            # logging.info(f"[i] Output file written to: {ARGS.outputfile}")
-
-        service_uris = sorted(service_uris, key=lambda x: x.uri)
+        service_uris = sorted(set(service_uris), key=lambda x: x.uri)
         for service in service_uris:
             print((f"{service.uri}{service.hostname}:{service.port}"))
 
