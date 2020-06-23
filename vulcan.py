@@ -29,24 +29,17 @@ def main():
 
             report_issues = list()
             for host in report_hosts:
-                logging.info(f"[i] Collecting services for host: {host.get('name')}")
+                logging.debug(f"[i] Collecting services for host: {host.get('name')}")
                 services = parser.parse_services(host, xml_namespaces)
-                logging.info(f"[i] Found {len(services)} service(s)")
+                logging.debug(f"[i] Found {len(services)} service(s)")
                 if services:
                     tcp_services = list(filter(lambda x: x.protocol == 'tcp', services))
                     udp_services = list(filter(lambda x: x.protocol == 'udp', services))
 
-                    logging.info(f"\tTCP: {len(tcp_services)}\n\tUDP: {len(udp_services)}")
+                    logging.debug(f"\tTCP: {len(tcp_services)}\n\tUDP: {len(udp_services)}")
 
-                # passed_percent = round(len(passed) / len(compliance_issues) * 100, 2) if len(passed) > 0 else 0
-                # failed_percent = round(len(failed) / len(compliance_issues) * 100, 2) if len(failed) > 0 else 0
-
-                # # strip out anything with a status of WARNING
-                # compliance_issues = list(filter(lambda x: x.result in ['PASSED', 'FAILED'], compliance_issues))
-                # logging.info(
-                #     f"[i] Found {len(compliance_issues)} compliance issues\n\tPassed: {len(passed)} ({passed_percent}%)\n\tFailed: {len(failed)} ({failed_percent}%)")
-
-                # report_issues = [*report_issues, *compliance_issues]
+                    for service in services:
+                        print(f"{service.uri}{service.hostname}:{service.port}")
 
             # sort issues by name
             # report_issues = sorted(report_issues, key=lambda x: x.name)

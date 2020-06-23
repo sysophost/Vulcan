@@ -40,19 +40,20 @@ def parse_services(report_host: ET.Element, ns: dict) -> list:
     for ri in report_items:
         if ri.attrib['pluginName'] == 'Service Detection':
             hostname = report_host.get('name')
-            port = ri.get('port')
+            port = int(ri.get('port'))
             service_name = ri.get('svc_name')
             protocol = ri.get('protocol')
             plugin_output = ri.get('plugin_output')
 
-            # TODO: map URI prefix based on svc_name
-            # TODO: identify TCP and UDP services separately
-
             # http_proxy, www, https? are all web things
-            # www is http
             # search for SSL/TLS in plugin_output to know to add https:
 
-            uri = ''
+            if port == 80 and protocol == 'tcp' and service_name == 'www':
+                uri = 'http://'
+            elif port in [443, 8443] and protocol == 'tcp' and service_name in ['www', 'https?', 'pcsync-https?']:
+                uri = 'https://'
+            else:
+                uri = f"{protocol}://"
 
             service = s.Service(hostname, port, service_name, protocol, uri)
             services.append(service)
