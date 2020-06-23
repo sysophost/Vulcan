@@ -25,7 +25,7 @@ def main():
     try:
         # get document root
         xml_doc = ET.parse(ARGS.inputfile).getroot()
-
+        service_uris = list()
         # iterate through all Report elements within the provided .nessus file
         for report in xml_doc.findall('Report'):
             report_hosts = parser.parse_hosts(report)
@@ -41,7 +41,7 @@ def main():
 
                     for service in services:
                         if (ARGS.urls and service.uri in ['http://', 'https://']) or not ARGS.urls:
-                            print(f"{service.uri}{service.hostname}:{service.port}")
+                            service_uris.append(f"{service.uri}{service.hostname}:{service.port}")
                 else:
                     logging.debug(f"[i] No services found")
 
@@ -50,6 +50,9 @@ def main():
             # headers = ['Host', 'Check Name', 'Configured Value', 'Expected Value', 'Info', 'Solution', 'Result']
             # output.write_output(ARGS.outputfile, headers, report_issues, ARGS.outputdelim)
             # logging.info(f"[i] Output file written to: {ARGS.outputfile}")
+
+        for uri in service_uris:
+            print(uri)
 
     except Exception as err:
         logging.error(f"[!] {err}")
