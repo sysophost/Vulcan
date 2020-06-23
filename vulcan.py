@@ -20,9 +20,6 @@ else:
 
 
 def main():
-    # define namespaces for non-default elements to stop search breaking
-    xml_namespaces = {'cm': 'http://www.nessus.org/cm'}
-
     logging.info(f"[i] Reading file from: {ARGS.inputfile}")
     try:
         # get document root
@@ -35,7 +32,7 @@ def main():
             report_issues = list()
             for host in report_hosts:
                 logging.debug(f"[i] Collecting services for host: {host.get('name')}")
-                services = parser.parse_services(host, xml_namespaces)
+                services = parser.parse_services(host)
                 if services:
                     tcp_services = list(filter(lambda x: x.protocol == 'tcp', services))
                     udp_services = list(filter(lambda x: x.protocol == 'udp', services))

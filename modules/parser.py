@@ -20,16 +20,15 @@ def parse_hosts(report: ET.Element) -> list:
     return report_hosts
 
 
-def parse_services(report_host: ET.Element, ns: dict) -> list:
+def parse_services(report_host: ET.Element) -> list:
     """
-    Extract compliance issues from the supplied ReportHost element
+    Extract identified services from the supplied ReportHost element
 
     Arguments:
         report_host {ET.Element} -- ReportHost element extracted from the current Report element
-        ns {dict} -- Node namespace aliases
 
     Returns:
-        list -- List of compliance issue objects for the given ReportHost
+        list -- List of services for the given ReportHost
     """
 
     host_properties = report_host.find('HostProperties')
