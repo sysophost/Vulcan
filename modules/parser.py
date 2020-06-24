@@ -70,7 +70,7 @@ def parse_services(report_host: ET.Element, use_fqdns: bool) -> list:
         # TODO: come up with a better way to map port/service/proto to a URI
         if port == 80 and protocol == 'tcp' and service_name == 'www':
             uri = 'http://'
-        elif port in [443, 8443] and protocol == 'tcp' and service_name in ['www', 'https?', 'pcsync-https?']:
+        elif port in [443, 8080, 8443] and protocol == 'tcp' and service_name in ['www', 'https?', 'pcsync-https?']:
             uri = 'https://'
         elif port == 21 and protocol == 'tcp' and service_name == 'ftp':
             uri = 'ftp://'
