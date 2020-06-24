@@ -20,7 +20,8 @@ Output FQDN instead of IP address (where one exists)
 
 ### Extract all http[s] endpoints and open in firefox
 `python vulcan.py -if <input .nessus file> -u  | xargs firefox`
-*this assumes that `firefox` is on the path. 
+
+*This assumes that `firefox` is on the path*
 
 ## TODO
 * Work out what to do with services that are not identified by Nessus
