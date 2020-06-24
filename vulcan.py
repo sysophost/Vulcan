@@ -8,6 +8,7 @@ from modules import parser
 PARSER = argparse.ArgumentParser()
 PARSER.add_argument('--inputfile', '-if', type=str, required=True, help='Path to input .nessus file')
 PARSER.add_argument('--urls', '-u', action='store_true', help='Only print things with http:// or https:// URI')
+PARSER.add_argument('--fqdns', '-f', action='store_true', help='Include resolved FQDN')
 PARSER.add_argument('--verbose', '-v', action='store_true', help='Enable verbose output')
 
 ARGS = PARSER.parse_args()
@@ -31,7 +32,7 @@ def main():
             report_issues = list()
             for host in report_hosts:
                 logging.debug(f"[i] Collecting services for host: {host.get('name')}")
-                services = parser.parse_services(host)
+                services = parser.parse_services(host, ARGS.fqdns)
                 if services:
                     tcp_services = list(filter(lambda x: x.protocol == 'tcp', services))
                     udp_services = list(filter(lambda x: x.protocol == 'udp', services))
