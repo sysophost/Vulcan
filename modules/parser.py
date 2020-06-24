@@ -38,47 +38,46 @@ def parse_services(report_host: ET.Element, use_fqdns: bool) -> list:
     host_properties = report_host.find('HostProperties')
     report_items = report_host.findall('ReportItem')
 
-    services = list()
+    parsed_services = list()
     fqdn = None
 
-    for ri in report_items:
-        if ri.attrib['pluginName'] == 'Host Fully Qualified Domain Name (FQDN) Resolution':
-            print("parsing FQDN")
-            plugin_output = getattr(ri.find('plugin_output'), 'text')
-            print(f"Inside if {fqdn}")
-            fqdn = re.search('((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,63}', plugin_output)[0]
-            print(f"Inside if {fqdn}")
-            logging.debug(f"[i] Found FQDN: {fqdn}")
+    fqdns = list(filter(lambda x: x.attrib['pluginName'] == 'Host Fully Qualified Domain Name (FQDN) Resolution', report_items))
+    detected_services = list(filter(lambda x: x.attrib['pluginName'] == 'Service Detection', report_items))
 
-        print(f"Outide if {fqdn}")
+    for item in fqdns:
+        plugin_output = getattr(item.find('plugin_output'), 'text')
+        fqdn = re.search('((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,63}', plugin_output)[0]
+        logging.debug(f"[i] Found FQDN: {fqdn}")
 
-        if ri.attrib['pluginName'] == 'Service Detection':
-            print(f"In second if {fqdn}")
+    for item in detected_services:
+        if use_fqdns and fqdn:
+            hostname = fqdn
+        else:
             hostname = report_host.get('name')
-            port = int(ri.get('port'))
-            service_name = ri.get('svc_name')
-            protocol = ri.get('protocol')
-            plugin_output = getattr(ri.find('plugin_output'), 'text')
+        port = int(item.get('port'))
+        service_name = item.get('svc_name')
+        protocol = item.get('protocol')
+        plugin_output = getattr(item.find('plugin_output'), 'text')
 
-            # http_proxy, www, https? are all web things
-            # search for SSL/TLS in plugin_output to know to add https:
+        # http_proxy, www, https? are all web things
+        # search for SSL/TLS in plugin_output to know to add https:
 
-            # TODO: come up with a better way to map port/service/proto to a URI
-            if port == 80 and protocol == 'tcp' and service_name == 'www':
-                uri = 'http://'
-            elif port in [443, 8443] and protocol == 'tcp' and service_name in ['www', 'https?', 'pcsync-https?']:
-                uri = 'https://'
-            elif port == 21 and protocol == 'tcp' and service_name == 'ftp':
-                uri = 'ftp://'
-            elif port == 22 and protocol == 'tcp' and service_name == 'ssh':
-                uri = 'ssh://'
-            else:
-                uri = f"{protocol}://"
+        # TODO: come up with a better way to map port/service/proto to a URI
+        if port == 80 and protocol == 'tcp' and service_name == 'www':
+            uri = 'http://'
+        elif port in [443, 8443] and protocol == 'tcp' and service_name in ['www', 'https?', 'pcsync-https?']:
+            uri = 'https://'
+        elif port == 21 and protocol == 'tcp' and service_name == 'ftp':
+            uri = 'ftp://'
+        elif port == 22 and protocol == 'tcp' and service_name == 'ssh':
+            uri = 'ssh://'
+        else:
+            uri = f"{protocol}://"
 
-            # TODO: If multiple host entries are matched, insert both?
-            # Maybe add a way to highlight the fact its multiple hostnames for the same box?
+        # TODO: If multiple host entries are matched, insert both?
+        # Maybe add a way to highlight the fact its multiple hostnames for the same box?
 
-            service = s.Service(hostname, port, service_name, protocol, uri)
-            services.append(service)
+        service = s.Service(hostname, port, service_name, protocol, uri)
+        parsed_services.append(service)
 
-    return services
+    return parsed_services
