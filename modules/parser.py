@@ -44,6 +44,11 @@ def parse_services(report_host: ET.Element, use_fqdns: bool) -> list:
     fqdns = list(filter(lambda x: x.attrib['pluginName'] == 'Host Fully Qualified Domain Name (FQDN) Resolution', report_items))
     detected_services = list(filter(lambda x: x.attrib['pluginName'] == 'Service Detection', report_items))
 
+    if len(fqdns) > 1:
+        print("Found multiple hostnames")
+        # TODO: If multiple host entries are matched, insert both?
+        # Maybe add a way to highlight the fact its multiple hostnames for the same box?
+
     for item in fqdns:
         plugin_output = getattr(item.find('plugin_output'), 'text')
         fqdn = re.search('((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,63}', plugin_output)[0]
@@ -73,9 +78,6 @@ def parse_services(report_host: ET.Element, use_fqdns: bool) -> list:
             uri = 'ssh://'
         else:
             uri = f"{protocol}://"
-
-        # TODO: If multiple host entries are matched, insert both?
-        # Maybe add a way to highlight the fact its multiple hostnames for the same box?
 
         service = s.Service(hostname, port, service_name, protocol, uri)
         parsed_services.append(service)
