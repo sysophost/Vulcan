@@ -52,7 +52,7 @@ def parse_services(report_host: ET.Element, use_fqdns: bool) -> list:
     for item in fqdns:
         plugin_output = getattr(item.find('plugin_output'), 'text')
         fqdn = re.search('((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,63}', plugin_output)[0]
-        logging.debug(f"[i] Found FQDN: {fqdn}")
+        logging.debug(f"\tFound FQDN: {fqdn}")
 
     for item in detected_services:
         if use_fqdns and fqdn:

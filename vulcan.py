@@ -36,13 +36,13 @@ def main():
                 if services:
                     tcp_services = list(filter(lambda x: x.protocol == 'tcp', services))
                     udp_services = list(filter(lambda x: x.protocol == 'udp', services))
-                    logging.debug(f"[i] Found {len(tcp_services)} TCP and {len(udp_services)} UDP services")
+                    logging.debug(f"\tFound {len(tcp_services)} TCP and {len(udp_services)} UDP services")
 
                     for service in services:
                         if (ARGS.urls and service.uri in ['http://', 'https://']) or not ARGS.urls:
                             service_uris.append(service)
                 else:
-                    logging.debug(f"[i] No services found")
+                    logging.debug(f"\tNo services found")
 
         service_uris = sorted(set(service_uris), key=lambda x: x.uri)
         for service in service_uris:
