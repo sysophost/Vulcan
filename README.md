@@ -27,3 +27,4 @@ Output FQDN instead of IP address (where one exists)
 * Work out what to do with services that are not identified by Nessus
 * Handle hosts with multple FQDNs
 * Design a better data structure to hold a mapping between Nessus service names and the associated URI
+* Take screenshots of http[s] URIs
