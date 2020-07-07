@@ -10,13 +10,21 @@ Tool to extract common URIs from `.nessus` files
 Path to the input `.nessus` file to parse
 
 ### Optional args
+`--services` / `-sv`
+
+Extract all services identified by the Service Detection plugin
+
 `--urls` / `-u`
 
-Only extract http[s] URIs
+Only extract http[s] URIs from the extracted services
 
-`--shares` / `-s`
+`--shares` / `-sh`
 
 Extract SMB shares
+
+`--sharepermissions` / `-sp`
+
+Extract SMB share permissions 
 
 `--fqdns` / `-f`
 
