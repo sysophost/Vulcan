@@ -14,6 +14,10 @@ Path to the input `.nessus` file to parse
 
 Only extract http[s] URIs
 
+`--shares` / `-s`
+
+Extract SMB shares
+
 `--fqdns` / `-f`
 
 Output FQDN instead of IP address (where one exists)
