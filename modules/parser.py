@@ -2,7 +2,8 @@ import logging
 import re
 from xml.etree import ElementTree as ET
 
-from models import service as s
+from models import service as svc
+from models import share as sh
 
 
 def parse_hosts(report: ET.Element) -> list:
@@ -79,7 +80,60 @@ def parse_services(report_host: ET.Element, use_fqdns: bool) -> list:
         else:
             uri = f"{protocol}://"
 
-        service = s.Service(hostname, port, service_name, protocol, uri)
+        service = svc.Service(hostname, port, service_name, protocol, uri)
         parsed_services.append(service)
 
     return parsed_services
+
+
+def parse_shares(report_host: ET.Element, use_fqdns: bool) -> list:
+    """
+    Extract SMB shares from the supplied ReportHost element
+
+    Arguments:
+        report_host {ET.Element} -- ReportHost element extracted from the current Report element
+        use_fqdns {bool} --  Flag to extract FQDNs from scan results
+
+    Returns:
+        list -- List of SMB shares for the given ReportHost
+    """
+
+    host_properties = report_host.find('HostProperties')
+    report_items = report_host.findall('ReportItem')
+
+    parsed_shares = list()
+    fqdn = None
+
+    fqdns = list(filter(lambda x: x.attrib['pluginName'] == 'Host Fully Qualified Domain Name (FQDN) Resolution', report_items))
+    detected_shares = list(filter(lambda x: x.attrib['pluginName'] == 'Microsoft Windows SMB Shares Enumeration', report_items))
+
+    if len(fqdns) > 1:
+        print("Found multiple hostnames")
+        # TODO: If multiple host entries are matched, insert both?
+        # Maybe add a way to highlight the fact its multiple hostnames for the same box?
+
+    for item in fqdns:
+        plugin_output = getattr(item.find('plugin_output'), 'text')
+        fqdn = re.search('((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,63}', plugin_output)[0]
+        logging.debug(f"\tFound FQDN: {fqdn}")
+
+    for item in detected_shares:
+        if use_fqdns and fqdn:
+            hostname = fqdn
+        else:
+            hostname = report_host.get('name')
+        port = int(item.get('port'))
+        service_name = item.get('svc_name')
+        protocol = item.get('protocol')
+        plugin_output = getattr(item.find('plugin_output'), 'text')
+
+        # parse plugin output to get all shares
+        plugin_output = plugin_output.strip().split('\n')
+        for line in plugin_output[3:]:  # skip the first 3 elements as they aren't relevant
+            share_name = re.search('^\s{2}-\s(.*)', line)[1]
+            #share_name = 'AAA'
+            uncpath = f"\\\\{hostname}\\{share_name}"
+            share = sh.Share(hostname, port, service_name, protocol, uncpath)
+            parsed_shares.append(share)
+
+    return parsed_shares
