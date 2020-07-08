@@ -16,7 +16,7 @@ Verbose output is written to `stderr`, so useful output can be piped directly to
 
 Path to the input `.nessus` file to parse
 <br><br><br>
-**You will need to specify at least one of `--services`, `--shares`, or `--sharepermissions`**
+**You will need to specify at least one of `--services`, `--urls`, `--shares`, or `--sharepermissions`**
 
 ### Optional args
 `--services` / `-sv`
