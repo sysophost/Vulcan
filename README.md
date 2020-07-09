@@ -8,6 +8,11 @@ In all cases, FQDNs can be included, where present, by specifying `--fqdns`
 
 Verbose output is written to `stderr`, so useful output can be piped directly to file, other tools, or the clipboard.
 
+## Installation
+`git clone --recurse-submodules https://github.com/sysophost/Vulcan`
+
+**remember to use `--recurse-submodules` to ensure you pick up the `pyShot` submodule**
+
 ## Usage
 `python vulcan.py --inputfile <input .nessus file> [--urls] [--fqdns]` 
 
@@ -38,6 +43,23 @@ Extract SMB share permissions identified by the `Microsoft Windows SMB Share Per
 `--fqdns` / `-f`
 
 Output FQDN instead of IP address (where one exists)
+
+
+`--screenshot` / `-s`
+
+Capture screenshots of identified http[s] services
+
+`--outputdir` / `-od`
+
+Output directory for screenshots 
+
+*If this doesn't exist it will be created*
+
+`--proxy` /  `-p`
+
+Proxy to use for outgoing screenshot connections
+
+This currently supports `HTTP` and `SOCKS4/5`
 
 ## Examples
 ### Extract all http[s] endpoints and open in firefox

@@ -1,14 +1,22 @@
 import argparse
+import asyncio
 import logging
+import os
 import sys
 from xml.etree import ElementTree as ET
 
+import pyppeteer
+
 from modules import parser
+from modules.pyShot import pyShot
 
 PARSER = argparse.ArgumentParser()
 PARSER.add_argument('--inputfile', '-if', type=str, required=True, help='Path to input .nessus file')
 PARSER.add_argument('--services', '-sv', action='store_true', help='Extract all services identified by the Service Detection plugin')
 PARSER.add_argument('--urls', '-u', action='store_true', help='Only print things with http:// or https:// URI')
+PARSER.add_argument('--screenshot', '-s', action='store_true', help='Capture screenshots of any http:// or https:// URI')
+PARSER.add_argument('--proxy', '-p', type=str, help='Proxy to use for capturing screenshots e.g. http://127.0.0.1:8080')
+PARSER.add_argument('--outputdir', '-od', type=str, help='Path to output directory for screenshots')
 PARSER.add_argument('--shares', '-sh', action='store_true', help='Extract SMB shares')
 PARSER.add_argument('--sharepermissions', '-sp', action='store_true', help='Extract SMB share permissions')
 PARSER.add_argument('--fqdns', '-f', action='store_true', help='Include resolved FQDN')
@@ -20,6 +28,32 @@ if ARGS.verbose:
     logging.basicConfig(format='%(message)s', level=logging.DEBUG, stream=sys.stderr)
 else:
     logging.basicConfig(format='%(message)s', level=logging.INFO, stream=sys.stderr)
+
+# Suppress pyppeteer logs
+pyppeteer_logger = logging.getLogger('pyppeteer')
+pyppeteer_logger.setLevel(logging.WARNING)
+
+
+async def capture(s: pyShot, browser: pyppeteer.browser, services: list):
+    coros = [s.capture_screenshot(browser, f"{service.uri}{service.hostname}:{service.port}") for service in services]
+    await asyncio.gather(*coros)
+    await browser.close()
+
+
+def screenshot_urls(proxy, outputdir, urls):
+    s = pyShot.pyShot(proxy, outputdir)
+    loop = asyncio.get_event_loop()
+    browser = loop.run_until_complete(s.get_browser())
+
+    if outputdir:
+        try:
+            if not os.path.isdir(outputdir):
+                os.mkdir(outputdir)
+        except Exception:
+            logging.error(f'[!] Something failed when creating the folder {outputdir}')
+            sys.exit(1)
+
+    loop.run_until_complete(capture(s, browser, urls))
 
 
 def main():
@@ -48,6 +82,10 @@ def main():
                         for service in services:
                             if (ARGS.urls and service.uri in ['http://', 'https://']) or not ARGS.urls:
                                 service_uris.append(service)
+
+                        if ARGS.screenshot:
+                            http_services = list(filter(lambda s: s.uri in ['http://', 'https://'], services))
+                            screenshot_urls(ARGS.proxy, ARGS.outputdir, http_services)
                     else:
                         logging.debug(f"\tNo services found")
 
