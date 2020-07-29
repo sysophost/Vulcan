@@ -139,6 +139,20 @@ def parse_share_permissions(report_host: ET.Element) -> list:
 
     return parsed_permissions
 
+def parse_vulnerabilities(report_host: ET.Element) -> list:
+    host_properties = report_host.find('HostProperties')
+    report_items = report_host.findall('ReportItem')
+
+    parsed_vulnerabilities = list()
+
+    for item in report_items:
+        plugin_name = item.get('pluginName')
+        plugin_severity = int(item.get('severity'))
+        if plugin_severity > 0:
+            parsed_vulnerabilities.append(plugin_name)
+
+    return parsed_vulnerabilities
+    
 
 def parse_fqdns(report_host: ET.Element) -> str:
     """

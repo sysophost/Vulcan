@@ -19,6 +19,7 @@ PARSER.add_argument('--proxy', '-p', type=str, help='Proxy to use for capturing 
 PARSER.add_argument('--outputdir', '-od', type=str, help='Path to output directory for screenshots')
 PARSER.add_argument('--shares', '-sh', action='store_true', help='Extract SMB shares')
 PARSER.add_argument('--sharepermissions', '-sp', action='store_true', help='Extract SMB share permissions')
+PARSER.add_argument('--listvulnerabilities', '-lv', action='store_true', help='List vulnerabilities by host')
 PARSER.add_argument('--fqdns', '-f', action='store_true', help='Include resolved FQDN')
 PARSER.add_argument('--verbose', '-v', action='store_true', help='Enable verbose output')
 
@@ -64,6 +65,7 @@ def main():
         service_uris = list()
         share_list = list()
         share_permissions_list = list()
+
         # iterate through all Report elements within the provided .nessus file
         for report in xml_doc.findall('Report'):
             report_hosts = parser.parse_hosts(report)
@@ -108,6 +110,17 @@ def main():
                             share_permissions_list.append(permission)
                     else:
                         logging.debug(f"\tNo share permissions found")
+
+                if ARGS.listvulnerabilities:
+                    logging.debug(f"[i] Collecting vulnerabilities for host: {host.get('name')}")
+                    vulnerabilities = parser.parse_vulnerabilities(host)
+
+                    if vulnerabilities:
+                        for vuln in vulnerabilities:
+                            print(f"{vuln}")
+                    else:
+                        logging.debug(f"\tNo vulnerabilities found")
+
 
         service_uris = sorted(set(service_uris), key=lambda x: x.uri)
         for service in service_uris:
