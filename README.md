@@ -17,7 +17,7 @@ Verbose output is written to `stderr`, so useful output can be piped directly to
 
 ## Usage
 
-`python vulcan.py --inputfile <input .nessus file> [--urls] [--fqdns]`
+`python vulcan.py --inputfile <input .nessus file> [--urls] [--shares] [--sharepermissions] [--screenshot] [--fqdns]`
 
 ### Required args
 
