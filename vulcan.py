@@ -116,8 +116,9 @@ def main():
                     vulnerabilities = parser.parse_vulnerabilities(host)
 
                     if vulnerabilities:
+                        vuln_list = sorted(set(vulnerabilities), key=lambda x: x.severity)
                         for vuln in vulnerabilities:
-                            print(f"{vuln}")
+                            print(f"{vuln.name} - {vuln.severity}")
                     else:
                         logging.debug(f"\tNo vulnerabilities found")
 

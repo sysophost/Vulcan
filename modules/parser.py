@@ -4,6 +4,7 @@ from xml.etree import ElementTree as ET
 
 from models import service as svc
 from models import share as sh
+from models import vulnerability as vl
 
 
 def parse_hosts(report: ET.Element) -> list:
@@ -148,8 +149,11 @@ def parse_vulnerabilities(report_host: ET.Element) -> list:
     for item in report_items:
         plugin_name = item.get('pluginName')
         plugin_severity = int(item.get('severity'))
-        if plugin_severity > 0:
-            parsed_vulnerabilities.append(plugin_name)
+
+        # ignore info things
+        if plugin_severity > 0: 
+            vuln = vl.Vulnerability(plugin_name, plugin_severity)
+            parsed_vulnerabilities.append(vuln)
 
     return parsed_vulnerabilities
     
