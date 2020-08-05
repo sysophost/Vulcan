@@ -20,6 +20,7 @@ PARSER.add_argument('--outputdir', '-od', type=str, help='Path to output directo
 PARSER.add_argument('--shares', '-sh', action='store_true', help='Extract SMB shares')
 PARSER.add_argument('--sharepermissions', '-sp', action='store_true', help='Extract SMB share permissions')
 PARSER.add_argument('--listvulnerabilities', '-lv', action='store_true', help='List vulnerabilities by host')
+PARSER.add_argument('--minseverity', '-ms', type=int, default=1, choices=[0, 1, 2, 3, 4], help='Filter by severity 0=Info, 4=Critical')
 PARSER.add_argument('--fqdns', '-f', action='store_true', help='Include resolved FQDN')
 PARSER.add_argument('--verbose', '-v', action='store_true', help='Enable verbose output')
 
@@ -118,8 +119,8 @@ def main():
                         logging.debug(f"\tNo share permissions found")
 
                 if ARGS.listvulnerabilities:
-                    logging.debug(f"[i] Collecting vulnerabilities for host: {hostname}")
-                    vulnerabilities = parser.parse_vulnerabilities(host)
+                    logging.info(f"[i] Collecting vulnerabilities for host: {hostname}")
+                    vulnerabilities = parser.parse_vulnerabilities(host, ARGS.minseverity)
 
                     if vulnerabilities:
                         vuln_list = sorted(set(vulnerabilities), key=lambda x: x.severity, reverse=True)

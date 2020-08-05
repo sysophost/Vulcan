@@ -94,8 +94,8 @@ def parse_shares(report_host: ET.Element, use_fqdns: bool) -> list:
         fqdn = None
 
     report_items = report_host.findall('ReportItem')
-    parsed_shares = list()
 
+    parsed_shares = list()
     detected_shares = list(filter(lambda x: x.attrib['pluginName'] == 'Microsoft Windows SMB Shares Enumeration', report_items))
 
     for item in detected_shares:
@@ -131,7 +131,6 @@ def parse_share_permissions(report_host: ET.Element) -> list:
     report_items = report_host.findall('ReportItem')
 
     parsed_permissions = list()
-
     all_permissions = list(filter(lambda x: x.attrib['pluginName'] == 'Microsoft Windows SMB Share Permissions Enumeration', report_items))
 
     for item in all_permissions:
@@ -140,20 +139,19 @@ def parse_share_permissions(report_host: ET.Element) -> list:
 
     return parsed_permissions
 
-def parse_vulnerabilities(report_host: ET.Element) -> list:
+def parse_vulnerabilities(report_host: ET.Element, minseverity: int) -> list:
     host_properties = report_host.find('HostProperties')
     report_items = report_host.findall('ReportItem')
 
     parsed_vulnerabilities = list()
+    all_vulnerabilities = list(filter(lambda x: int(x.get('severity')) >= minseverity, report_items))
 
-    for item in report_items:
+    for item in all_vulnerabilities:
         plugin_name = item.get('pluginName')
         plugin_severity = int(item.get('severity'))
 
-        # ignore info things
-        if plugin_severity > 0: 
-            vuln = vl.Vulnerability(plugin_name, plugin_severity)
-            parsed_vulnerabilities.append(vuln)
+        vuln = vl.Vulnerability(plugin_name, plugin_severity)
+        parsed_vulnerabilities.append(vuln)
 
     return parsed_vulnerabilities
     
