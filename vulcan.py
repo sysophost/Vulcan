@@ -72,9 +72,15 @@ def main():
 
             report_issues = list()
             for host in report_hosts:
+                if ARGS.fqdns:
+                    fqdn = parser.parse_fqdns(host)
+                else:
+                    fqdn = None
+
+                hostname = fqdn or host.get('name')
 
                 if ARGS.services or ARGS.urls:
-                    logging.debug(f"[i] Collecting services for host: {host.get('name')}")
+                    logging.debug(f"[i] Collecting services for host: {hostname}")
                     services = parser.parse_services(host, ARGS.fqdns)
                     if services:
                         tcp_services = list(filter(lambda x: x.protocol == 'tcp', services))
@@ -92,7 +98,7 @@ def main():
                         logging.debug(f"\tNo services found")
 
                 if ARGS.shares:
-                    logging.debug(f"[i] Collecting shares for host: {host.get('name')}")
+                    logging.debug(f"[i] Collecting shares for host: {hostname}")
                     shares = parser.parse_shares(host, ARGS.fqdns)
                     if shares:
                         logging.debug(f"\tFound {len(shares)} share(s)")
@@ -102,7 +108,7 @@ def main():
                         logging.debug(f"\tNo shares found")
 
                 if ARGS.sharepermissions:
-                    logging.debug(f"[i] Collecting share permissions for host: {host.get('name')}")
+                    logging.debug(f"[i] Collecting share permissions for host: {hostname}")
                     share_permissions = parser.parse_share_permissions(host)
                     if share_permissions:
                         logging.debug(f"\tFound permissions for share(s)")
@@ -112,7 +118,7 @@ def main():
                         logging.debug(f"\tNo share permissions found")
 
                 if ARGS.listvulnerabilities:
-                    logging.debug(f"[i] Collecting vulnerabilities for host: {host.get('name')}")
+                    logging.debug(f"[i] Collecting vulnerabilities for host: {hostname}")
                     vulnerabilities = parser.parse_vulnerabilities(host)
 
                     if vulnerabilities:
