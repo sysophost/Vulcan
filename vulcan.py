@@ -118,7 +118,7 @@ def main():
                     if vulnerabilities:
                         vuln_list = sorted(set(vulnerabilities), key=lambda x: x.severity, reverse=True)
                         for vuln in vuln_list:
-                            print(f"{vuln.name} - {vuln.severity}")
+                            print(f"{vuln.severity_name} - {vuln.name}")
                     else:
                         logging.debug(f"\tNo vulnerabilities found")
 
