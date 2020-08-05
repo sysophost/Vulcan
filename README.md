@@ -25,7 +25,7 @@ Verbose output is written to `stderr`, so useful output can be piped directly to
 
 Path to the input `.nessus` file to parse
 <br><br><br>
-**You will need to specify at least one of `--services`, `--urls`, `--shares`, or `--sharepermissions`**
+**You will need to specify at least one of `--services`, `--urls`, `--shares`, `--sharepermissions` or `--listvulnerabilities`**
 
 ### Optional args
 
@@ -44,6 +44,20 @@ Extract SMB shares identified by the `Microsoft Windows SMB Shares Enumeration` 
 `--sharepermissions` / `-sp`
 
 Extract SMB share permissions identified by the `Microsoft Windows SMB Share Permissions Enumeration` in *authenticated* scans
+
+`--listvulnerabilities` / `-lv`
+
+List all vulnerabilties in the supplied `.nessus` file and group by host
+
+`--minseverity` / `-ms`
+
+Set minimum severity level filter (0-4). Default=1
+
+* 0=Info
+* 1=Low
+* 2=Medium
+* 3=High
+* 4=Critical
 
 `--fqdns` / `-f`
 
@@ -78,4 +92,4 @@ This currently supports `HTTP` and `SOCKS4/5`
 * Work out what to do with services that are not identified by Nessus
 * Handle hosts with multple FQDNs
 * Design a better data structure to hold a mapping between Nessus service names and the associated URI
-* Take screenshots of http[s] URIs
+* ~~Take screenshots of http[s] URIs~~
