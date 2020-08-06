@@ -125,7 +125,7 @@ def main():
                     vulnerabilities = parser.parse_vulnerabilities(host, ARGS.minseverity)
 
                     if vulnerabilities:
-                        logging.debug(f"[i] Found {len(vulnerabilities)} vulnerabilities")
+                        logging.debug(f"\tFound {len(vulnerabilities)} vulnerabilities")
                         vuln_list = sorted(set(vulnerabilities), key=lambda x: x.severity, reverse=True)
                         for vuln in vuln_list:
                             vulnerability_list.append(vuln)
