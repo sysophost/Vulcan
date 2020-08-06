@@ -20,6 +20,7 @@ PARSER.add_argument('--outputdir', '-od', type=str, help='Path to output directo
 PARSER.add_argument('--shares', '-sh', action='store_true', help='Extract SMB shares')
 PARSER.add_argument('--sharepermissions', '-sp', action='store_true', help='Extract SMB share permissions')
 PARSER.add_argument('--listvulnerabilities', '-lv', action='store_true', help='List vulnerabilities by host')
+PARSER.add_argument('--listallvulnerabilities', '-lva', action='store_true', help='List unique vulnerabilities')
 PARSER.add_argument('--minseverity', '-ms', type=int, default=1, choices=[0, 1, 2, 3, 4], help='Filter by severity 0=Info, 4=Critical')
 PARSER.add_argument('--fqdns', '-f', action='store_true', help='Include resolved FQDN')
 PARSER.add_argument('--verbose', '-v', action='store_true', help='Enable verbose output')
@@ -66,6 +67,7 @@ def main():
         service_uris = list()
         share_list = list()
         share_permissions_list = list()
+        vulnerability_list = list()
 
         # iterate through all Report elements within the provided .nessus file
         for report in xml_doc.findall('Report'):
@@ -118,14 +120,17 @@ def main():
                     else:
                         logging.debug(f"\tNo share permissions found")
 
-                if ARGS.listvulnerabilities:
-                    logging.info(f"[i] Collecting vulnerabilities for host: {hostname}")
+                if ARGS.listvulnerabilities or ARGS.listallvulnerabilities:
+                    logging.debug(f"[i] Collecting vulnerabilities for host: {hostname}")
                     vulnerabilities = parser.parse_vulnerabilities(host, ARGS.minseverity)
 
                     if vulnerabilities:
+                        logging.debug(f"[i] Found {len(vulnerabilities)} vulnerabilities")
                         vuln_list = sorted(set(vulnerabilities), key=lambda x: x.severity, reverse=True)
                         for vuln in vuln_list:
-                            print(f"{vuln.severity_name} - {vuln.name}")
+                            vulnerability_list.append(vuln)
+                            if not ARGS.listallvulnerabilities:
+                                print(f"{hostname}\t{vuln.severity_name}\t{vuln.name}")
                     else:
                         logging.debug(f"\tNo vulnerabilities found")
 
@@ -140,6 +145,11 @@ def main():
 
         for permission in share_permissions_list:
             print(f"{permission}")
+
+        if ARGS.listallvulnerabilities:
+            vulnerability_list = sorted({v.name:v for v in vulnerability_list}.values(), key=lambda x: x.severity, reverse=True)
+            for vulnerability in vulnerability_list:
+                print(f"{vulnerability.severity_name} - {vulnerability.name}")
 
     except Exception as err:
         logging.error(f"[!] {err}")
