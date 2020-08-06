@@ -64,9 +64,6 @@ def main():
     try:
         # get document root
         xml_doc = ET.parse(ARGS.inputfile).getroot()
-        service_uris = list()
-        share_list = list()
-        share_permissions_list = list()
         vulnerability_list = list()
 
         # iterate through all Report elements within the provided .nessus file
@@ -88,63 +85,53 @@ def main():
                     if services:
                         tcp_services = list(filter(lambda x: x.protocol == 'tcp', services))
                         udp_services = list(filter(lambda x: x.protocol == 'udp', services))
-                        logging.debug(f"\tFound {len(tcp_services)} TCP and {len(udp_services)} UDP services")
+                        logging.debug(f"[i] Found {len(tcp_services)} TCP and {len(udp_services)} UDP services")
 
+                        services = sorted(set(services), key=lambda x: x.uri)
                         for service in services:
                             if (ARGS.urls and service.uri in ['http://', 'https://']) or not ARGS.urls:
-                                service_uris.append(service)
+                                print(f"{service.uri}{service.hostname}:{service.port}")
 
                         if ARGS.screenshot:
                             http_services = list(filter(lambda s: s.uri in ['http://', 'https://'], services))
                             screenshot_urls(ARGS.proxy, ARGS.outputdir, http_services)
                     else:
-                        logging.debug(f"\tNo services found")
+                        logging.debug(f"[x] No services found")
 
                 if ARGS.shares:
                     logging.debug(f"[i] Collecting shares for host: {hostname}")
                     shares = parser.parse_shares(host, ARGS.fqdns)
                     if shares:
-                        logging.debug(f"\tFound {len(shares)} share(s)")
+                        logging.debug(f"[i] Found {len(shares)} share(s)")
+                        shares = sorted(set(shares), key=lambda x: x.uncpath)
                         for share in shares:
-                            share_list.append(share)
+                            print(f"{share.uncpath}")
                     else:
-                        logging.debug(f"\tNo shares found")
+                        logging.debug(f"[x] No shares found")
 
                 if ARGS.sharepermissions:
                     logging.debug(f"[i] Collecting share permissions for host: {hostname}")
                     share_permissions = parser.parse_share_permissions(host)
                     if share_permissions:
-                        logging.debug(f"\tFound permissions for share(s)")
+                        logging.debug(f"[i] Found permissions for share(s)")
                         for permission in share_permissions:
-                            share_permissions_list.append(permission)
+                            print(f"{permission}")
                     else:
-                        logging.debug(f"\tNo share permissions found")
+                        logging.debug(f"[x] No share permissions found")
 
                 if ARGS.listvulnerabilities or ARGS.listallvulnerabilities:
                     logging.debug(f"[i] Collecting vulnerabilities for host: {hostname}")
                     vulnerabilities = parser.parse_vulnerabilities(host, ARGS.minseverity)
 
                     if vulnerabilities:
-                        logging.debug(f"\tFound {len(vulnerabilities)} vulnerabilities")
+                        logging.debug(f"[i] Found {len(vulnerabilities)} vulnerabilities")
                         vuln_list = sorted(set(vulnerabilities), key=lambda x: x.severity, reverse=True)
                         for vuln in vuln_list:
                             vulnerability_list.append(vuln)
-                            if not ARGS.listallvulnerabilities:
+                            if ARGS.listvulnerabilities:
                                 print(f"{hostname}\t{vuln.severity_name}\t{vuln.name}")
                     else:
-                        logging.debug(f"\tNo vulnerabilities found")
-
-
-        service_uris = sorted(set(service_uris), key=lambda x: x.uri)
-        for service in service_uris:
-            print(f"{service.uri}{service.hostname}:{service.port}")
-
-        share_list = sorted(set(share_list), key=lambda x: x.uncpath)
-        for share in share_list:
-            print(f"{share.uncpath}")
-
-        for permission in share_permissions_list:
-            print(f"{permission}")
+                        logging.debug(f"[x] No vulnerabilities found")
 
         if ARGS.listallvulnerabilities:
             vulnerability_list = sorted({v.name:v for v in vulnerability_list}.values(), key=lambda x: x.severity, reverse=True)
