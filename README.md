@@ -47,7 +47,11 @@ Extract SMB share permissions identified by the `Microsoft Windows SMB Share Per
 
 `--listvulnerabilities` / `-lv`
 
-List all vulnerabilties in the supplied `.nessus` file and group by host
+List all vulnerabilties in the supplied `.nessus` file and group by host (ordered by severity in descending order)
+
+`--listallvulnerabilities` / `-lva`
+
+List unique vulnerabilities in the supplied `.nessus` file, and order by severity in descending order.
 
 `--minseverity` / `-ms`
 
