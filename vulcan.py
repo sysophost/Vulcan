@@ -74,6 +74,8 @@ def main():
             for host in report_hosts:
                 if ARGS.fqdns:
                     fqdn = parser.parse_fqdns(host)
+                else:
+                    fqdn = None
 
                 hostname = fqdn or host.get('name')
 
