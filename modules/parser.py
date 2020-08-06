@@ -140,6 +140,16 @@ def parse_share_permissions(report_host: ET.Element) -> list:
     return parsed_permissions
 
 def parse_vulnerabilities(report_host: ET.Element, minseverity: int) -> list:
+    """
+    Parse vulnerabilities from the supplied ReportHost element
+
+    Args:
+        report_host (ET.Element): ReportHost elemenet extracted from teh current Report element
+        minseverity (int): Minimum issue severity to include
+
+    Returns:
+        list: List of vulnerabilities for the given ReportHost
+    """    
     host_properties = report_host.find('HostProperties')
     report_items = report_host.findall('ReportItem')
 
