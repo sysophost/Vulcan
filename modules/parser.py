@@ -139,7 +139,7 @@ def parse_share_permissions(report_host: ET.Element) -> list:
 
     return parsed_permissions
 
-def parse_vulnerabilities(report_host: ET.Element, minseverity: int) -> list:
+def parse_vulnerabilities(report_host: ET.Element, minseverity: int, maxseverity: int) -> list:
     """
     Parse vulnerabilities from the supplied ReportHost element
 
@@ -154,7 +154,7 @@ def parse_vulnerabilities(report_host: ET.Element, minseverity: int) -> list:
     report_items = report_host.findall('ReportItem')
 
     parsed_vulnerabilities = list()
-    all_vulnerabilities = list(filter(lambda x: int(x.get('severity')) >= minseverity, report_items))
+    all_vulnerabilities = list(filter(lambda x: int(x.get('severity')) >= minseverity and int(x.get('severity')) <= maxseverity, report_items))
 
     for item in all_vulnerabilities:
         plugin_name = item.get('pluginName')

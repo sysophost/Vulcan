@@ -1,7 +1,7 @@
 # Vulcan
 
 Tool to extract various things from `.nessus` files.
-At the moment it does common service URIs (`--services`), SMB shares (`--shares`), and SMB share permissions (`--sharepermissions`).
+At the moment it does common service URIs (`--services`), SMB shares (`--shares`), SMB share permissions (`--sharepermissions`), and vulnerabilities (`--listvulnerabilities` and `--listallvulnerabilities`).
 
 Services can optionally be filtered to just http[s] using `--urls`.
 
@@ -53,9 +53,13 @@ List all vulnerabilties in the supplied `.nessus` file and group by host (ordere
 
 List unique vulnerabilities in the supplied `.nessus` file, and order by severity in descending order.
 
-`--minseverity` / `-ms`
+`--minseverity` / `-ns`
 
 Set minimum severity level filter (0-4). Default=1
+
+`--maxseverity` / `-xs`
+
+Set maximum severity level filter (0-4). Default=4
 
 * 0=Info
 * 1=Low

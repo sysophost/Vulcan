@@ -21,7 +21,8 @@ PARSER.add_argument('--shares', '-sh', action='store_true', help='Extract SMB sh
 PARSER.add_argument('--sharepermissions', '-sp', action='store_true', help='Extract SMB share permissions')
 PARSER.add_argument('--listvulnerabilities', '-lv', action='store_true', help='List vulnerabilities by host')
 PARSER.add_argument('--listallvulnerabilities', '-lva', action='store_true', help='List unique vulnerabilities')
-PARSER.add_argument('--minseverity', '-ms', type=int, default=1, choices=[0, 1, 2, 3, 4], help='Filter by severity 0=Info, 4=Critical')
+PARSER.add_argument('--minseverity', '-ns', type=int, default=1, choices=[0, 1, 2, 3, 4], help='Filter by minimum severity 0=Info, 4=Critical')
+PARSER.add_argument('--maxseverity', '-xs', type=int, default=5, choices=[0, 1, 2, 3, 4], help='Filter by maximum severity 0=Info, 4=Critical')
 PARSER.add_argument('--fqdns', '-f', action='store_true', help='Include resolved FQDN')
 PARSER.add_argument('--verbose', '-v', action='store_true', help='Enable verbose output')
 
@@ -121,7 +122,7 @@ def main():
 
                 if ARGS.listvulnerabilities or ARGS.listallvulnerabilities:
                     logging.debug(f"[i] Collecting vulnerabilities for host: {hostname}")
-                    vulnerabilities = parser.parse_vulnerabilities(host, ARGS.minseverity)
+                    vulnerabilities = parser.parse_vulnerabilities(host, ARGS.minseverity, ARGS.maxseverity)
 
                     if vulnerabilities:
                         logging.debug(f"[i] Found {len(vulnerabilities)} vulnerabilities")
@@ -134,7 +135,7 @@ def main():
                         logging.debug(f"[x] No vulnerabilities found")
 
         if ARGS.listallvulnerabilities:
-            vulnerability_list = sorted({v.name:v for v in vulnerability_list}.values(), key=lambda x: x.severity, reverse=True)
+            vulnerability_list = sorted({v.name: v for v in vulnerability_list}.values(), key=lambda x: x.severity, reverse=True)
             for vulnerability in vulnerability_list:
                 print(f"{vulnerability.severity_name} - {vulnerability.name}")
 
