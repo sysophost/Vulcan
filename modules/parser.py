@@ -61,7 +61,7 @@ def parse_services(report_host: ET.Element, use_fqdns: bool) -> list:
         # TODO: come up with a better way to map port/service/proto to a URI
         if port == 80 and protocol == 'tcp' and service_name == 'www':
             uri = 'http://'
-        elif port in [443, 8080, 8443] and protocol == 'tcp' and service_name in ['www', 'https?', 'pcsync-https?']:
+        elif protocol == 'tcp' and service_name in ['www', 'https?', 'pcsync-https?']:
             uri = 'https://'
         elif port == 21 and protocol == 'tcp' and service_name == 'ftp':
             uri = 'ftp://'
@@ -139,6 +139,7 @@ def parse_share_permissions(report_host: ET.Element) -> list:
 
     return parsed_permissions
 
+
 def parse_vulnerabilities(report_host: ET.Element, minseverity: int, maxseverity: int) -> list:
     """
     Parse vulnerabilities from the supplied ReportHost element
@@ -149,7 +150,7 @@ def parse_vulnerabilities(report_host: ET.Element, minseverity: int, maxseverity
 
     Returns:
         list: List of vulnerabilities for the given ReportHost
-    """    
+    """
     host_properties = report_host.find('HostProperties')
     report_items = report_host.findall('ReportItem')
 
@@ -164,7 +165,7 @@ def parse_vulnerabilities(report_host: ET.Element, minseverity: int, maxseverity
         parsed_vulnerabilities.append(vuln)
 
     return parsed_vulnerabilities
-    
+
 
 def parse_fqdns(report_host: ET.Element) -> str:
     """
